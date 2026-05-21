@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Course Tracker Dashboard</title>
+<style>
+   /* ------------------ BASE ------------------ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+body {
+    background: #F5F6FA;
+    color: #2F3A4B;
+    padding: 30px;
+    transition: background 0.3s, color 0.3s;
+}
+body.dark-mode {
+    background: #1E1E2F;
+    color: #E0E0E0;
+}
+
+/* ------------------ HEADER ------------------ */
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* ------------------ FORM ------------------ */
+form#courseForm {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    transition: all 0.3s;
+}
+body.dark-mode form#courseForm { background: #2A2A3D; }
+
+form input, form select, form textarea {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #D1D5DB;
+    font-size: 0.95rem;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+form input:focus, form select:focus, form textarea:focus {
+    border-color: #4A90E2;
+    box-shadow: 0 0 8px rgba(74,144,226,0.3);
+    outline: none;
+}
+body.dark-mode form input, body.dark-mode form select, body.dark-mode form textarea {
+    background: #3A3A4D;
+    border: 1px solid #555;
+    color: #E0E0E0;
+}
+
+form button {
+    grid-column: span 2;
+    padding: 12px 20px;
+    background-color: #4A90E2;
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+form button:hover {
+    background-color: #357ABD;
+    transform: translateY(-2px);
+}
+
+/* ------------------ TOP CONTROLS ------------------ */
+.top-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+.top-controls input, .top-controls select { padding: 10px 12px; border-radius: 8px; border: 1px solid #D1D5DB; }
+body.dark-mode .top-controls input, body.dark-mode .top-controls select { background: #3A3A4D; color: #E0E0E0; border: 1px solid #555; }
+
+.top-controls button.dark-mode-toggle {
+    margin-left: auto;
+    background-color: #4A90E2;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.top-controls button.dark-mode-toggle:hover {
+    background-color: #357ABD;
+    transform: translateY(-2px);
+}
+
+/* ------------------ TABLE ------------------ */
+table#courseTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    background: #ffffff;
+    transition: all 0.3s ease;
+}
+body.dark-mode table#courseTable { background: #2A2A3D; }
+
+table th, table td {
+    padding: 12px 10px;
+    text-align: left;
+    font-size: 0.9rem;
+}
+table th {
+    background: #2F3A4B;
+    color: #F1F2F6;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+body.dark-mode table th { background: #3A3A4D; color: #E0E0E0; }
+
+table tr {
+    transition: all 0.2s ease;
+}
+table tr:hover {
+    transform: scale(1.01);
+    background-color: #F0F4FF;
+}
+body.dark-mode table tr:hover { background-color: #3F3F55; }
+
+tr.completed { background-color: #D1F7D6; }
+tr.ongoing { background-color: #FFF4CC; }
+tr.upcoming { background-color: #E2E3E5; }
+body.dark-mode tr.completed { background-color: #28A74533; }
+body.dark-mode tr.ongoing { background-color: #FFC10733; }
+body.dark-mode tr.upcoming { background-color: #6C757D33; }
+
+/* ------------------ PROGRESS BAR ------------------ */
+.progress-bar-container {
+    background: #E5E5E5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+body.dark-mode .progress-bar-container { background: #555; }
+
+.progress-bar {
+    height: 10px;
+    background-color: #4A90E2;
+    transition: width 0.5s ease;
+}
+body.dark-mode .progress-bar { background-color: #357ABD; border-radius: 8px; }
+
+/* ------------------ ANALYTICS ------------------ */
+#analytics {
+    margin-top: 20px;
+    font-size: 1rem;
+    padding: 15px 20px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+body.dark-mode #analytics { background: #2A2A3D; }
+
+/* ------------------ CSV / IMPORT BUTTONS ------------------ */
+#exportCSV, #importCSV {
+    margin-top: 10px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    background-color: #4A90E2;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+#exportCSV:hover, #importCSV:hover { transform: translateY(-2px); background-color: #357ABD; }
+
+/* ------------------ STAR RATING ------------------ */
+.star-rating span { font-size: 1rem; cursor: pointer; transition: all 0.2s ease; }
+.star-rating span:hover { transform: scale(1.2); color: #FFC107; }
+</style>
+</head>
+<body>
+
+<h1>Advanced Course Tracker Dashboard</h1>
+
+<div class="top-controls">
+    <input type="text" id="search" placeholder="Search by Name, University, Category...">
+    <select id="filterStatus">
+        <option value="">All Status</option>
+        <option value="Completed">Completed</option>
+        <option value="Ongoing">Ongoing</option>
+        <option value="Upcoming">Upcoming</option>
+    </select>
+    <select id="filterCertificate">
+        <option value="">All Certificates</option>
+        <option value="Yes">With Certificate</option>
+        <option value="No">Without Certificate</option>
+    </select>
+    <select id="sortBy">
+        <option value="">Sort By</option>
+        <option value="startDate">Start Date</option>
+        <option value="completeDate">Completion Date</option>
+        <option value="rating">Rating</option>
+        <option value="hours">Course Hours</option>
+    </select>
+    <button id="darkModeToggle" class="dark-mode-toggle">Toggle Dark Mode</button>
+</div>
+
+<form id="courseForm">
+    <input type="text" id="serial" placeholder="Serial" required>
+    <input type="text" id="name" placeholder="Course Name" required>
+    <input type="url" id="weblink" placeholder="Course Link" required>
+    <select id="certificate"><option value="Yes">Yes</option><option value="No">No</option></select>
+    <input type="number" id="hours" placeholder="Course Hours" required>
+    <input type="text" id="university" placeholder="University / Platform" required>
+    <input type="date" id="startDate" required>
+    <input type="date" id="completeDate" required>
+    <input type="number" id="rating" placeholder="Rating 0-5" min="0" max="5" step="0.1">
+    <input type="text" id="category" placeholder="Category / Skill">
+    <input type="text" id="instructor" placeholder="Instructor Name">
+    <input type="text" id="price" placeholder="Price / Cost">
+    <input type="text" id="tags" placeholder="Tags (comma-separated)">
+    <textarea id="notes" rows="2" placeholder="Personal Notes"></textarea>
+    <input type="url" id="certLink" placeholder="Certificate Link">
+    <button type="submit">Add / Save Course</button>
+</form>
+
+<table id="courseTable">
+<thead>
+<tr>
+    <th>Serial</th>
+    <th>Name</th>
+    <th>Link</th>
+    <th>Certificate</th>
+    <th>Hours</th>
+    <th>University</th>
+    <th>Start</th>
+    <th>Completion</th>
+    <th>Status</th>
+    <th>Progress</th>
+    <th>Rating</th>
+    <th>Category</th>
+    <th>Instructor</th>
+    <th>Price</th>
+    <th>Tags</th>
+    <th>Notes</th>
+    <th>Cert Link</th>
+    <th>Actions</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<div id="analytics" style="margin-top:15px;">
+    <strong>Total Courses:</strong> <span id="totalCourses">0</span> | 
+    <strong>Completed:</strong> <span id="completedCourses">0</span> | 
+    <strong>Average Rating:</strong> <span id="avgRating">0</span> | 
+    <strong>Total Hours:</strong> <span id="totalHours">0</span>
+</div>
+
+<div style="margin-top:10px;">
+    <button id="exportCSV">Export CSV</button>
+    <input type="file" id="importCSV" accept=".csv">
+</div>
+
+<script>
+let courses = JSON.parse(localStorage.getItem('courses')) || [];
+let editIndex = -1;
+
+function saveCourses() {
+    localStorage.setItem('courses', JSON.stringify(courses));
+    renderTable();
+}
+
+function calculateStatus(course) {
+    const today = new Date();
+    const start = new Date(course.startDate);
+    const end = new Date(course.completeDate);
+    if(today > end) return 'Completed';
+    else if(today >= start && today <= end) return 'Ongoing';
+    else return 'Upcoming';
+}
+
+function calculateProgress(course) {
+    const today = new Date();
+    const start = new Date(course.startDate);
+    const end = new Date(course.completeDate);
+    if(today <= start) return 0;
+    else if(today >= end) return 100;
+    else return Math.round((today - start)/(end-start)*100);
+}
+
+function renderTable() {
+    const tbody = document.querySelector('#courseTable tbody');
+    tbody.innerHTML = '';
+    let filtered = courses;
+
+    // Filtering
+    const searchVal = document.getElementById('search').value.toLowerCase();
+    if(searchVal) filtered = filtered.filter(c => c.name.toLowerCase().includes(searchVal) || c.university.toLowerCase().includes(searchVal) || c.category.toLowerCase().includes(searchVal));
+    const statusFilter = document.getElementById('filterStatus').value;
+    if(statusFilter) filtered = filtered.filter(c => calculateStatus(c) === statusFilter);
+    const certFilter = document.getElementById('filterCertificate').value;
+    if(certFilter) filtered = filtered.filter(c => c.certificate === certFilter);
+
+    // Sorting
+    const sortBy = document.getElementById('sortBy').value;
+    if(sortBy) filtered.sort((a,b)=>sortBy==='rating'||sortBy==='hours'?b[sortBy]-a[sortBy]: new Date(a[sortBy]) - new Date(b[sortBy]));
+
+    // Table rows
+    filtered.forEach((course, index)=>{
+        const status = calculateStatus(course);
+        const progress = calculateProgress(course);
+        const tr = document.createElement('tr');
+        tr.className = status.toLowerCase();
+        tr.innerHTML = `
+            <td>${course.serial}</td>
+            <td>${course.name}</td>
+            <td><a href="${course.weblink}" target="_blank">Link</a></td>
+            <td>${course.certificate}</td>
+            <td>${course.hours}</td>
+            <td>${course.university}</td>
+            <td>${course.startDate}</td>
+            <td>${course.completeDate}</td>
+            <td>${status}</td>
+            <td><div class="progress-bar-container"><div class="progress-bar" style="width:${progress}%"></div></div></td>
+            <td>${course.rating}</td>
+            <td>${course.category}</td>
+            <td>${course.instructor}</td>
+            <td>${course.price}</td>
+            <td>${course.tags}</td>
+            <td>${course.notes}</td>
+            <td>${course.certLink ? `<a href="${course.certLink}" target="_blank">Link</a>` : ''}</td>
+            <td>
+                <button onclick="editCourse(${index})">Edit</button>
+                <button onclick="deleteCourse(${index})">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Analytics
+    const totalCourses = courses.length;
+    const completedCourses = courses.filter(c=>calculateStatus(c)==='Completed').length;
+    const avgRating = (courses.reduce((sum,c)=>sum+Number(c.rating||0),0)/totalCourses||0).toFixed(2);
+    const totalHours = courses.reduce((sum,c)=>sum+Number(c.hours||0),0);
+    document.getElementById('totalCourses').textContent = totalCourses;
+    document.getElementById('completedCourses').textContent = completedCourses;
+    document.getElementById('avgRating').textContent = avgRating;
+    document.getElementById('totalHours').textContent = totalHours;
+}
+
+function editCourse(index){
+    editIndex = index;
+    const c = courses[index];
+    for(const key in c) {
+        if(document.getElementById(key)) document.getElementById(key).value = c[key];
+    }
+}
+
+function deleteCourse(index){
+    if(confirm('Delete this course?')) {
+        courses.splice(index,1);
+        saveCourses();
+    }
+}
+
+document.getElementById('courseForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const course = {
+        serial:document.getElementById('serial').value,
+        name:document.getElementById('name').value,
+        weblink:document.getElementById('weblink').value,
+        certificate:document.getElementById('certificate').value,
+        hours:document.getElementById('hours').value,
+        university:document.getElementById('university').value,
+        startDate:document.getElementById('startDate').value,
+        completeDate:document.getElementById('completeDate').value,
+        rating:document.getElementById('rating').value,
+        category:document.getElementById('category').value,
+        instructor:document.getElementById('instructor').value,
+        price:document.getElementById('price').value,
+        tags:document.getElementById('tags').value,
+        notes:document.getElementById('notes').value,
+        certLink:document.getElementById('certLink').value
+    };
+    if(editIndex>=0) courses[editIndex]=course;
+    else courses.push(course);
+    editIndex=-1;
+    form.reset();
+    saveCourses();
+});
+
+document.getElementById('search').addEventListener('input', renderTable);
+document.getElementById('filterStatus').addEventListener('change', renderTable);
+document.getElementById('filterCertificate').addEventListener('change', renderTable);
+document.getElementById('sortBy').addEventListener('change', renderTable);
+
+document.getElementById('darkModeToggle').addEventListener('click', ()=>{
+    document.body.classList.toggle('dark-mode');
+});
+
+document.getElementById('exportCSV').addEventListener('click', ()=>{
+    let csv = 'Serial,Name,Weblink,Certificate,Hours,University,StartDate,CompleteDate,Rating,Category,Instructor,Price,Tags,Notes,CertLink\n';
+    courses.forEach(c=>{
+        csv+=`"${c.serial}","${c.name}","${c.weblink}","${c.certificate}","${c.hours}","${c.university}","${c.startDate}","${c.completeDate}","${c.rating}","${c.category}","${c.instructor}","${c.price}","${c.tags}","${c.notes}","${c.certLink}"\n`;
+    });
+    const blob = new Blob([csv],{type:'text/csv'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download='courses.csv';
+    link.click();
+});
+
+document.getElementById('importCSV').addEventListener('change', e=>{
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event){
+        const lines = event.target.result.split('\n').slice(1);
+        lines.forEach(line=>{
+            const vals = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v=>v.replace(/^"|"$/g,''));
+            if(vals[0]) courses.push({
+                serial:vals[0], name:vals[1], weblink:vals[2], certificate:vals[3],
+                hours:vals[4], university:vals[5], startDate:vals[6], completeDate:vals[7],
+                rating:vals[8], category:vals[9], instructor:vals[10], price:vals[11],
+                tags:vals[12], notes:vals[13], certLink:vals[14]
+            });
+        });
+        saveCourses();
+    };
+    reader.readAsText(file);
+});
+
+renderTable();
+</script>
+
+</body>
+</html>
