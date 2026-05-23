@@ -1,310 +1,586 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced Course Tracker Dashboard</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pro Learning Dashboard</title>
 <style>
-/* ------------------ BASE ------------------ */
+:root {
+    --bg: #f4f7fb;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --text: #111827;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --success: #16a34a;
+    --warning: #f59e0b;
+    --danger: #dc2626;
+    --purple: #7c3aed;
+    --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    --radius: 18px;
+}
+
+body.dark-mode {
+    --bg: #0f172a;
+    --surface: #111827;
+    --surface-2: #1f2937;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --border: #334155;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-body {
-    background: #F5F6FA;
-    color: #2F3A4B;
-    padding: 30px;
-    transition: background 0.3s, color 0.3s;
-}
-body.dark-mode {
-    background: #1E1E2F;
-    color: #E0E0E0;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* ------------------ HEADER ------------------ */
-h1 {
-    text-align: center;
-    font-size: 2rem;
+body {
+    background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 32%), var(--bg);
+    color: var(--text);
+    padding: 26px;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.header h1 {
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    line-height: 1.1;
+}
+
+.header p {
+    color: var(--muted);
+    margin-top: 6px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button, .button-like {
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
     font-weight: 700;
+    background: var(--primary);
+    color: #fff;
+    transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+button:hover, .button-like:hover {
+    transform: translateY(-1px);
+    background: var(--primary-dark);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+button.secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+button.secondary:hover {
+    background: var(--surface-2);
+    box-shadow: none;
+}
+
+button.danger {
+    background: var(--danger);
+}
+
+button.small {
+    padding: 7px 10px;
+    font-size: 0.82rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(130px, 1fr));
+    gap: 14px;
     margin-bottom: 20px;
 }
 
-/* ------------------ FORM ------------------ */
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+}
+
+.stat-card span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-card strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 1.45rem;
+}
+
+.controls,
+.form-card,
+.table-card,
+.insights-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: 2fr repeat(5, minmax(150px, 1fr));
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.form-card {
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+.form-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.form-title h2 {
+    font-size: 1.18rem;
+}
+
+.form-title p {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
 form#courseForm {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
-    padding: 25px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    margin-bottom: 25px;
-    transition: all 0.3s;
-}
-body.dark-mode form#courseForm { background: #2A2A3D; }
-
-form input, form select, form textarea {
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #D1D5DB;
-    font-size: 0.95rem;
-    transition: border 0.2s, box-shadow 0.2s;
-}
-form input:focus, form select:focus, form textarea:focus {
-    border-color: #4A90E2;
-    box-shadow: 0 0 8px rgba(74,144,226,0.3);
-    outline: none;
-}
-body.dark-mode form input, body.dark-mode form select, body.dark-mode form textarea {
-    background: #3A3A4D;
-    border: 1px solid #555;
-    color: #E0E0E0;
-}
-
-form button {
-    grid-column: span 2;
-    padding: 12px 20px;
-    background-color: #4A90E2;
-    color: #ffffff;
-    font-weight: 600;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-form button:hover {
-    background-color: #357ABD;
-    transform: translateY(-2px);
-}
-
-/* ------------------ TOP CONTROLS ------------------ */
-.top-controls {
-    display: flex;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
     gap: 12px;
-    margin-bottom: 20px;
-    align-items: center;
-}
-.top-controls input, .top-controls select {
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #D1D5DB;
-}
-body.dark-mode .top-controls input, body.dark-mode .top-controls select {
-    background: #3A3A4D;
-    color: #E0E0E0;
-    border: 1px solid #555;
 }
 
-.top-controls button.dark-mode-toggle {
+.full { grid-column: 1 / -1; }
+.half { grid-column: span 2; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-2);
+    color: var(--text);
+    outline: none;
+    font-size: 0.92rem;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 72px;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.status-line {
+    color: var(--muted);
     margin-left: auto;
-    background-color: #4A90E2;
-    color: #ffffff;
-    font-weight: 600;
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.top-controls button.dark-mode-toggle:hover {
-    background-color: #357ABD;
-    transform: translateY(-2px);
+    align-self: center;
+    font-size: 0.88rem;
 }
 
-/* ------------------ TABLE ------------------ */
-.table-wrapper {
+.insights-card {
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.insights-card h2 {
+    font-size: 1.08rem;
+    margin-bottom: 12px;
+}
+
+.platform-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 10px;
+}
+
+.platform-pill {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.platform-pill span {
+    color: var(--muted);
+}
+
+.table-card {
+    overflow: hidden;
+}
+
+.table-scroll {
     width: 100%;
     overflow-x: auto;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
-table#courseTable {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    overflow: hidden;
-    background: #ffffff;
-    transition: all 0.3s ease;
-    min-width: 1500px;
-}
-body.dark-mode table#courseTable { background: #2A2A3D; }
 
-table th, table td {
+table {
+    width: 100%;
+    min-width: 1800px;
+    border-collapse: collapse;
+}
+
+th, td {
     padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
     text-align: left;
-    font-size: 0.9rem;
+    font-size: 0.86rem;
     vertical-align: top;
 }
-table th {
-    background: #2F3A4B;
-    color: #F1F2F6;
+
+th {
+    background: var(--surface-2);
+    color: var(--muted);
     position: sticky;
     top: 0;
     z-index: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.72rem;
 }
-body.dark-mode table th { background: #3A3A4D; color: #E0E0E0; }
 
-table tr { transition: all 0.2s ease; }
-table tr:hover { background-color: #F0F4FF; }
-body.dark-mode table tr:hover { background-color: #3F3F55; }
+tr:hover td {
+    background: rgba(37, 99, 235, 0.05);
+}
 
-tr.completed { background-color: #D1F7D6; }
-tr.ongoing { background-color: #FFF4CC; }
-tr.upcoming { background-color: #E2E3E5; }
-body.dark-mode tr.completed { background-color: #28A74533; }
-body.dark-mode tr.ongoing { background-color: #FFC10733; }
-body.dark-mode tr.upcoming { background-color: #6C757D33; }
+a {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+}
 
-/* ------------------ PROGRESS BAR ------------------ */
-.progress-bar-container {
-    background: #E5E5E5;
-    border-radius: 8px;
+.badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.badge.success { background: rgba(22, 163, 74, 0.12); color: var(--success); border-color: rgba(22, 163, 74, 0.24); }
+.badge.warning { background: rgba(245, 158, 11, 0.12); color: var(--warning); border-color: rgba(245, 158, 11, 0.24); }
+.badge.danger { background: rgba(220, 38, 38, 0.12); color: var(--danger); border-color: rgba(220, 38, 38, 0.24); }
+.badge.purple { background: rgba(124, 58, 237, 0.12); color: var(--purple); border-color: rgba(124, 58, 237, 0.24); }
+
+.progress-shell {
+    width: 130px;
+    height: 10px;
+    background: var(--border);
+    border-radius: 999px;
     overflow: hidden;
-    min-width: 90px;
+    margin-bottom: 5px;
 }
-body.dark-mode .progress-bar-container { background: #555; }
 
 .progress-bar {
-    height: 10px;
-    background-color: #4A90E2;
-    transition: width 0.5s ease;
-}
-body.dark-mode .progress-bar { background-color: #357ABD; border-radius: 8px; }
-
-/* ------------------ ANALYTICS ------------------ */
-#analytics {
-    margin-top: 20px;
-    font-size: 1rem;
-    padding: 15px 20px;
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-}
-body.dark-mode #analytics { background: #2A2A3D; }
-
-/* ------------------ CSV / IMPORT BUTTONS ------------------ */
-#exportCSV, #importCSV {
-    margin-top: 10px;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-weight: 600;
-    border: none;
-    background-color: #4A90E2;
-    color: #ffffff;
-    transition: all 0.3s ease;
-}
-#exportCSV:hover, #importCSV:hover {
-    transform: translateY(-2px);
-    background-color: #357ABD;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--purple));
+    border-radius: inherit;
 }
 
-.action-btn {
-    padding: 7px 10px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    margin: 2px;
+.row-actions {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
 }
-.edit-btn { background: #4A90E2; color: white; }
-.delete-btn { background: #E74C3C; color: white; }
-.status-msg {
-    margin: 12px 0 18px;
-    font-weight: 600;
-    color: #357ABD;
+
+.footer-tools {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
 }
-body.dark-mode .status-msg { color: #8AB4F8; }
+
+#importCSV {
+    display: none;
+}
+
+.empty-state {
+    padding: 30px;
+    color: var(--muted);
+    text-align: center;
+}
+
+@media (max-width: 1300px) {
+    .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
+    .controls { grid-template-columns: repeat(2, 1fr); }
+    form#courseForm { grid-template-columns: repeat(2, 1fr); }
+    .platform-list { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+    body { padding: 14px; }
+    .header { flex-direction: column; align-items: flex-start; }
+    .dashboard-grid, .controls, form#courseForm, .platform-list { grid-template-columns: 1fr; }
+    .half { grid-column: 1 / -1; }
+    .status-line { margin-left: 0; }
+}
 </style>
 </head>
 <body>
+<header class="header">
+    <div>
+        <h1>Pro Learning Dashboard</h1>
+        <p>Track courses, platforms, certificates, roadmap, learning goals, and progress across devices.</p>
+    </div>
+    <div class="header-actions">
+        <button class="secondary" id="darkModeToggle" type="button">Toggle Dark Mode</button>
+        <button class="secondary" id="refreshBtn" type="button">Refresh Data</button>
+    </div>
+</header>
 
-<h1>Advanced Course Tracker Dashboard</h1>
-<p id="statusMessage" class="status-msg">Loading courses from Firebase...</p>
+<section class="dashboard-grid">
+    <div class="stat-card"><span>Total Courses</span><strong id="totalCourses">0</strong></div>
+    <div class="stat-card"><span>Completed</span><strong id="completedCourses">0</strong></div>
+    <div class="stat-card"><span>In Progress</span><strong id="ongoingCourses">0</strong></div>
+    <div class="stat-card"><span>Certificates</span><strong id="certificatesEarned">0</strong></div>
+    <div class="stat-card"><span>Total Hours</span><strong id="totalHours">0</strong></div>
+    <div class="stat-card"><span>Avg Rating</span><strong id="avgRating">0</strong></div>
+    <div class="stat-card"><span>Top Platform</span><strong id="topPlatform">-</strong></div>
+    <div class="stat-card"><span>Overdue</span><strong id="overdueCourses">0</strong></div>
+</section>
 
-<div class="top-controls">
-    <input type="text" id="search" placeholder="Search by Name, University, Category...">
+<section class="controls">
+    <input type="text" id="search" placeholder="Search course, platform, provider, category, tags..." />
+    <select id="filterPlatform">
+        <option value="">All Platforms</option>
+    </select>
     <select id="filterStatus">
         <option value="">All Status</option>
+        <option value="Planned">Planned</option>
+        <option value="Not Started">Not Started</option>
+        <option value="In Progress">In Progress</option>
         <option value="Completed">Completed</option>
-        <option value="Ongoing">Ongoing</option>
-        <option value="Upcoming">Upcoming</option>
+        <option value="Paused">Paused</option>
+        <option value="Dropped">Dropped</option>
+    </select>
+    <select id="filterPriority">
+        <option value="">All Priority</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
     </select>
     <select id="filterCertificate">
-        <option value="">All Certificates</option>
-        <option value="Yes">With Certificate</option>
-        <option value="No">Without Certificate</option>
+        <option value="">All Certificate Status</option>
+        <option value="No Certificate">No Certificate</option>
+        <option value="Certificate Available">Certificate Available</option>
+        <option value="Certificate Earned">Certificate Earned</option>
+        <option value="Certificate Uploaded">Certificate Uploaded</option>
     </select>
     <select id="sortBy">
         <option value="">Sort By</option>
+        <option value="roadmapOrder">Roadmap Order</option>
         <option value="startDate">Start Date</option>
-        <option value="completeDate">Completion Date</option>
+        <option value="targetCompleteDate">Target Completion</option>
+        <option value="actualCompleteDate">Actual Completion</option>
         <option value="rating">Rating</option>
         <option value="hours">Course Hours</option>
+        <option value="priority">Priority</option>
     </select>
-    <button id="darkModeToggle" class="dark-mode-toggle">Toggle Dark Mode</button>
-</div>
+</section>
 
-<form id="courseForm">
-    <input type="text" id="serial" placeholder="Serial" required>
-    <input type="text" id="name" placeholder="Course Name" required>
-    <input type="url" id="weblink" placeholder="Course Link" required>
-    <select id="certificate"><option value="Yes">Yes</option><option value="No">No</option></select>
-    <input type="number" id="hours" placeholder="Course Hours" required>
-    <input type="text" id="university" placeholder="University / Platform" required>
-    <input type="date" id="startDate" required>
-    <input type="date" id="completeDate" required>
-    <input type="number" id="rating" placeholder="Rating 0-5" min="0" max="5" step="0.1">
-    <input type="text" id="category" placeholder="Category / Skill">
-    <input type="text" id="instructor" placeholder="Instructor Name">
-    <input type="text" id="price" placeholder="Price / Cost">
-    <input type="text" id="tags" placeholder="Tags (comma-separated)">
-    <textarea id="notes" rows="2" placeholder="Personal Notes"></textarea>
-    <input type="url" id="certLink" placeholder="Certificate Link">
-    <button type="submit" id="submitBtn">Add / Save Course</button>
-</form>
+<section class="form-card">
+    <div class="form-title">
+        <div>
+            <h2 id="formHeading">Add New Course</h2>
+            <p>Platform, provider, roadmap, goal, certificate, and project tracking included.</p>
+        </div>
+    </div>
 
-<div class="table-wrapper">
-<table id="courseTable">
-<thead>
-<tr>
-    <th>Serial</th>
-    <th>Name</th>
-    <th>Link</th>
-    <th>Certificate</th>
-    <th>Hours</th>
-    <th>University</th>
-    <th>Start</th>
-    <th>Completion</th>
-    <th>Status</th>
-    <th>Progress</th>
-    <th>Rating</th>
-    <th>Category</th>
-    <th>Instructor</th>
-    <th>Price</th>
-    <th>Tags</th>
-    <th>Notes</th>
-    <th>Cert Link</th>
-    <th>Actions</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+    <form id="courseForm">
+        <input type="text" id="serial" placeholder="Serial / ID" required />
+        <input type="text" id="name" placeholder="Course Name" required />
+        <select id="platform" required>
+            <option value="">Select Platform</option>
+            <option value="Coursera">Coursera</option>
+            <option value="Udemy">Udemy</option>
+            <option value="Alison">Alison</option>
+            <option value="edX">edX</option>
+            <option value="Great Learning">Great Learning</option>
+            <option value="LinkedIn Learning">LinkedIn Learning</option>
+            <option value="YouTube">YouTube</option>
+            <option value="MindLuster">MindLuster</option>
+            <option value="DataCamp">DataCamp</option>
+            <option value="freeCodeCamp">freeCodeCamp</option>
+            <option value="Other">Other</option>
+        </select>
+        <input type="text" id="provider" placeholder="Provider / University / Instructor Org" required />
 
-<div id="analytics">
-    <strong>Total Courses:</strong> <span id="totalCourses">0</span> | 
-    <strong>Completed:</strong> <span id="completedCourses">0</span> | 
-    <strong>Average Rating:</strong> <span id="avgRating">0</span> | 
-    <strong>Total Hours:</strong> <span id="totalHours">0</span>
-</div>
+        <input type="url" id="weblink" placeholder="Course Link" required />
+        <select id="category">
+            <option value="">Skill Category</option>
+            <option value="Excel">Excel</option>
+            <option value="Data Analysis">Data Analysis</option>
+            <option value="Python">Python</option>
+            <option value="SQL">SQL</option>
+            <option value="Power BI">Power BI</option>
+            <option value="Web Development">Web Development</option>
+            <option value="AI / Machine Learning">AI / Machine Learning</option>
+            <option value="Business">Business</option>
+            <option value="SCM">SCM</option>
+            <option value="Finance">Finance</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Design">Design</option>
+            <option value="Language">Language</option>
+            <option value="Other">Other</option>
+        </select>
+        <select id="skillLevel">
+            <option value="">Skill Level</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+        </select>
+        <select id="manualStatus">
+            <option value="Planned">Planned</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Paused">Paused</option>
+            <option value="Dropped">Dropped</option>
+        </select>
 
-<div style="margin-top:10px;">
-    <button id="exportCSV">Export CSV</button>
-    <input type="file" id="importCSV" accept=".csv">
-</div>
+        <select id="priority">
+            <option value="Medium">Medium Priority</option>
+            <option value="High">High Priority</option>
+            <option value="Low">Low Priority</option>
+        </select>
+        <input type="date" id="startDate" required />
+        <input type="date" id="targetCompleteDate" required />
+        <input type="date" id="actualCompleteDate" />
+
+        <input type="number" id="hours" placeholder="Total Course Hours" min="0" step="0.5" required />
+        <input type="number" id="weeklyTarget" placeholder="Target Hours / Week" min="0" step="0.5" />
+        <select id="costType">
+            <option value="Free">Free</option>
+            <option value="Paid">Paid</option>
+            <option value="Scholarship">Scholarship</option>
+            <option value="Trial">Trial</option>
+            <option value="Subscription">Subscription</option>
+        </select>
+        <input type="text" id="price" placeholder="Price / Cost" />
+
+        <select id="certificateStatus">
+            <option value="No Certificate">No Certificate</option>
+            <option value="Certificate Available">Certificate Available</option>
+            <option value="Certificate Earned">Certificate Earned</option>
+            <option value="Certificate Uploaded">Certificate Uploaded</option>
+        </select>
+        <input type="date" id="certIssueDate" />
+        <input type="text" id="credentialId" placeholder="Credential ID" />
+        <input type="url" id="certLink" placeholder="Certificate Verification Link" />
+
+        <input type="number" id="rating" placeholder="Rating 0-5" min="0" max="5" step="0.1" />
+        <input type="number" id="roadmapOrder" placeholder="Roadmap Order e.g. 1, 2, 3" min="0" step="1" />
+        <input type="text" id="tags" placeholder="Tags: excel, dashboard, beginner" />
+        <input type="url" id="projectLink" placeholder="Project / GitHub / Portfolio Link" />
+
+        <textarea id="learningGoal" class="half" placeholder="Learning Goal: Why are you taking this course?"></textarea>
+        <textarea id="keyLearnings" class="half" placeholder="Key Learnings: important topics, tools, formulas, skills..."></textarea>
+        <textarea id="outcome" class="half" placeholder="Outcome: what did you build or achieve after finishing?"></textarea>
+        <textarea id="notes" class="half" placeholder="Personal Notes"></textarea>
+
+        <div class="form-actions">
+            <button type="submit" id="submitBtn">Add Course</button>
+            <button type="button" class="secondary" id="clearFormBtn">Clear Form</button>
+            <span class="status-line" id="statusLine">Connected to Firebase Firestore.</span>
+        </div>
+    </form>
+</section>
+
+<section class="insights-card">
+    <h2>Platform Analytics</h2>
+    <div id="platformAnalytics" class="platform-list"></div>
+</section>
+
+<section class="table-card">
+    <div class="table-scroll">
+        <table id="courseTable">
+            <thead>
+                <tr>
+                    <th>Roadmap</th>
+                    <th>Serial</th>
+                    <th>Course</th>
+                    <th>Platform</th>
+                    <th>Provider</th>
+                    <th>Category</th>
+                    <th>Level</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Dates</th>
+                    <th>Deadline</th>
+                    <th>Progress</th>
+                    <th>Hours</th>
+                    <th>Cost</th>
+                    <th>Certificate</th>
+                    <th>Rating</th>
+                    <th>Goal / Outcome</th>
+                    <th>Links</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div id="emptyState" class="empty-state" style="display:none;">No courses found. Add your first course above.</div>
+    </div>
+    <div class="footer-tools">
+        <button id="exportCSV" type="button">Export CSV</button>
+        <label for="importCSV" class="button-like">Import CSV</label>
+        <input type="file" id="importCSV" accept=".csv" />
+    </div>
+</section>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -315,7 +591,8 @@ import {
     getDocs,
     updateDoc,
     deleteDoc,
-    doc
+    doc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -335,285 +612,448 @@ const coursesCollection = collection(db, "courses");
 let courses = [];
 let editDocId = null;
 
+const fields = [
+    "serial", "name", "platform", "provider", "weblink", "category", "skillLevel", "manualStatus",
+    "priority", "startDate", "targetCompleteDate", "actualCompleteDate", "hours", "weeklyTarget",
+    "costType", "price", "certificateStatus", "certIssueDate", "credentialId", "certLink", "rating",
+    "roadmapOrder", "tags", "projectLink", "learningGoal", "keyLearnings", "outcome", "notes"
+];
+
+const priorityWeight = { High: 3, Medium: 2, Low: 1 };
+
 function setStatus(message) {
-    document.getElementById('statusMessage').textContent = message;
+    document.getElementById("statusLine").textContent = message;
 }
 
-function escapeHTML(value) {
-    return String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+function escapeHTML(value = "") {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
-function safeUrl(url) {
-    const value = String(url ?? '').trim();
-    if (!value) return '#';
-    try {
-        const parsed = new URL(value);
-        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return value;
-    } catch (error) {
-        return '#';
-    }
-    return '#';
+function getFormData() {
+    const data = {};
+    fields.forEach((id) => {
+        const element = document.getElementById(id);
+        data[id] = element ? element.value.trim() : "";
+    });
+    data.hours = Number(data.hours || 0);
+    data.weeklyTarget = Number(data.weeklyTarget || 0);
+    data.rating = Number(data.rating || 0);
+    data.roadmapOrder = Number(data.roadmapOrder || 0);
+    return data;
+}
+
+function fillForm(course) {
+    fields.forEach((id) => {
+        const element = document.getElementById(id);
+        if (element) element.value = course[id] ?? "";
+    });
+}
+
+function resetForm() {
+    editDocId = null;
+    document.getElementById("courseForm").reset();
+    document.getElementById("manualStatus").value = "Planned";
+    document.getElementById("priority").value = "Medium";
+    document.getElementById("costType").value = "Free";
+    document.getElementById("certificateStatus").value = "No Certificate";
+    document.getElementById("submitBtn").textContent = "Add Course";
+    document.getElementById("formHeading").textContent = "Add New Course";
+    setStatus("Connected to Firebase Firestore.");
+}
+
+function normalizeCourse(raw) {
+    return {
+        serial: raw.serial || "",
+        name: raw.name || "",
+        platform: raw.platform || "Other",
+        provider: raw.provider || raw.university || "",
+        weblink: raw.weblink || "",
+        category: raw.category || "",
+        skillLevel: raw.skillLevel || "",
+        manualStatus: raw.manualStatus || raw.status || "Planned",
+        priority: raw.priority || "Medium",
+        startDate: raw.startDate || "",
+        targetCompleteDate: raw.targetCompleteDate || raw.completeDate || "",
+        actualCompleteDate: raw.actualCompleteDate || "",
+        hours: Number(raw.hours || 0),
+        weeklyTarget: Number(raw.weeklyTarget || 0),
+        costType: raw.costType || "Free",
+        price: raw.price || "",
+        certificateStatus: raw.certificateStatus || (raw.certificate === "Yes" ? "Certificate Available" : "No Certificate"),
+        certIssueDate: raw.certIssueDate || "",
+        credentialId: raw.credentialId || "",
+        certLink: raw.certLink || "",
+        rating: Number(raw.rating || 0),
+        roadmapOrder: Number(raw.roadmapOrder || 0),
+        tags: raw.tags || "",
+        projectLink: raw.projectLink || "",
+        learningGoal: raw.learningGoal || "",
+        keyLearnings: raw.keyLearnings || "",
+        outcome: raw.outcome || "",
+        notes: raw.notes || ""
+    };
 }
 
 async function loadCourses() {
+    setStatus("Loading courses from Firebase...");
     try {
-        setStatus('Loading courses from Firebase...');
         courses = [];
-
-        const querySnapshot = await getDocs(coursesCollection);
-        querySnapshot.forEach((document) => {
-            courses.push({
-                id: document.id,
-                ...document.data()
-            });
+        const snapshot = await getDocs(coursesCollection);
+        snapshot.forEach((documentSnapshot) => {
+            courses.push({ id: documentSnapshot.id, ...normalizeCourse(documentSnapshot.data()) });
         });
-
         renderTable();
-        setStatus('Connected to Firebase. Data will show on any device.');
+        setStatus(`Loaded ${courses.length} course(s) from Firebase.`);
     } catch (error) {
         console.error(error);
-        setStatus('Firebase loading failed. Check Firestore rules and console errors.');
+        setStatus("Could not load Firebase data. Check Firestore rules and internet connection.");
     }
 }
 
-function calculateStatus(course) {
-    const today = new Date();
-    const start = new Date(course.startDate);
-    const end = new Date(course.completeDate);
+function getStatusClass(status) {
+    if (status === "Completed") return "success";
+    if (status === "In Progress") return "purple";
+    if (status === "Paused" || status === "Planned") return "warning";
+    if (status === "Dropped") return "danger";
+    return "";
+}
 
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 'Upcoming';
-    if (today > end) return 'Completed';
-    if (today >= start && today <= end) return 'Ongoing';
-    return 'Upcoming';
+function getDeadlineInfo(course) {
+    const status = course.manualStatus;
+    if (!course.targetCompleteDate) return { text: "No target", type: "" };
+    if (status === "Completed") return { text: "Completed", type: "success" };
+    if (status === "Dropped") return { text: "Dropped", type: "danger" };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(course.targetCompleteDate);
+    target.setHours(0, 0, 0, 0);
+    const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return { text: `${Math.abs(diffDays)} day(s) overdue`, type: "danger" };
+    if (diffDays === 0) return { text: "Due today", type: "warning" };
+    if (diffDays <= 7) return { text: `${diffDays} day(s) left`, type: "warning" };
+    return { text: `${diffDays} day(s) left`, type: "success" };
 }
 
 function calculateProgress(course) {
+    if (course.manualStatus === "Completed") return 100;
+    if (course.manualStatus === "Not Started" || course.manualStatus === "Planned") return 0;
+    if (!course.startDate || !course.targetCompleteDate) return 0;
+
     const today = new Date();
     const start = new Date(course.startDate);
-    const end = new Date(course.completeDate);
+    const end = new Date(course.targetCompleteDate);
 
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
     if (today <= start) return 0;
-    if (today >= end) return 100;
-    return Math.round((today - start) / (end - start) * 100);
+    if (today >= end) return course.manualStatus === "In Progress" ? 95 : 100;
+    return Math.max(0, Math.min(100, Math.round(((today - start) / (end - start)) * 100)));
 }
 
-function renderTable() {
-    const tbody = document.querySelector('#courseTable tbody');
-    tbody.innerHTML = '';
-
+function getFilteredCourses() {
     let filtered = [...courses];
+    const searchVal = document.getElementById("search").value.toLowerCase().trim();
+    const platform = document.getElementById("filterPlatform").value;
+    const status = document.getElementById("filterStatus").value;
+    const priority = document.getElementById("filterPriority").value;
+    const certificate = document.getElementById("filterCertificate").value;
+    const sortBy = document.getElementById("sortBy").value;
 
-    const searchVal = document.getElementById('search').value.toLowerCase().trim();
     if (searchVal) {
-        filtered = filtered.filter(c =>
-            String(c.name || '').toLowerCase().includes(searchVal) ||
-            String(c.university || '').toLowerCase().includes(searchVal) ||
-            String(c.category || '').toLowerCase().includes(searchVal)
-        );
+        filtered = filtered.filter((c) => [
+            c.name, c.platform, c.provider, c.category, c.skillLevel, c.tags, c.learningGoal, c.keyLearnings, c.outcome, c.notes
+        ].join(" ").toLowerCase().includes(searchVal));
     }
+    if (platform) filtered = filtered.filter((c) => c.platform === platform);
+    if (status) filtered = filtered.filter((c) => c.manualStatus === status);
+    if (priority) filtered = filtered.filter((c) => c.priority === priority);
+    if (certificate) filtered = filtered.filter((c) => c.certificateStatus === certificate);
 
-    const statusFilter = document.getElementById('filterStatus').value;
-    if (statusFilter) filtered = filtered.filter(c => calculateStatus(c) === statusFilter);
-
-    const certFilter = document.getElementById('filterCertificate').value;
-    if (certFilter) filtered = filtered.filter(c => c.certificate === certFilter);
-
-    const sortBy = document.getElementById('sortBy').value;
     if (sortBy) {
         filtered.sort((a, b) => {
-            if (sortBy === 'rating' || sortBy === 'hours') {
-                return Number(b[sortBy] || 0) - Number(a[sortBy] || 0);
-            }
-            return new Date(a[sortBy]) - new Date(b[sortBy]);
+            if (sortBy === "rating" || sortBy === "hours" || sortBy === "roadmapOrder") return Number(b[sortBy] || 0) - Number(a[sortBy] || 0);
+            if (sortBy === "priority") return (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0);
+            return new Date(a[sortBy] || "9999-12-31") - new Date(b[sortBy] || "9999-12-31");
         });
     }
 
-    filtered.forEach((course) => {
-        const status = calculateStatus(course);
-        const progress = calculateProgress(course);
-        const tr = document.createElement('tr');
-        tr.className = status.toLowerCase();
+    return filtered;
+}
 
+function updatePlatformFilter() {
+    const select = document.getElementById("filterPlatform");
+    const current = select.value;
+    const platforms = [...new Set(courses.map((c) => c.platform).filter(Boolean))].sort();
+    select.innerHTML = '<option value="">All Platforms</option>';
+    platforms.forEach((platform) => {
+        const option = document.createElement("option");
+        option.value = platform;
+        option.textContent = platform;
+        select.appendChild(option);
+    });
+    select.value = platforms.includes(current) ? current : "";
+}
+
+function updateAnalytics() {
+    const totalCourses = courses.length;
+    const completedCourses = courses.filter((c) => c.manualStatus === "Completed").length;
+    const ongoingCourses = courses.filter((c) => c.manualStatus === "In Progress").length;
+    const certificatesEarned = courses.filter((c) => ["Certificate Earned", "Certificate Uploaded"].includes(c.certificateStatus)).length;
+    const totalHours = courses.reduce((sum, c) => sum + Number(c.hours || 0), 0);
+    const rated = courses.filter((c) => Number(c.rating || 0) > 0);
+    const avgRating = rated.length ? (rated.reduce((sum, c) => sum + Number(c.rating || 0), 0) / rated.length).toFixed(2) : "0";
+    const overdueCourses = courses.filter((c) => getDeadlineInfo(c).type === "danger" && !["Completed", "Dropped"].includes(c.manualStatus)).length;
+
+    const platformCounts = courses.reduce((acc, c) => {
+        const key = c.platform || "Other";
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+    const topPlatform = Object.entries(platformCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+
+    document.getElementById("totalCourses").textContent = totalCourses;
+    document.getElementById("completedCourses").textContent = completedCourses;
+    document.getElementById("ongoingCourses").textContent = ongoingCourses;
+    document.getElementById("certificatesEarned").textContent = certificatesEarned;
+    document.getElementById("totalHours").textContent = totalHours;
+    document.getElementById("avgRating").textContent = avgRating;
+    document.getElementById("topPlatform").textContent = topPlatform;
+    document.getElementById("overdueCourses").textContent = overdueCourses;
+
+    const container = document.getElementById("platformAnalytics");
+    container.innerHTML = "";
+    const entries = Object.entries(platformCounts).sort((a, b) => b[1] - a[1]);
+    if (!entries.length) {
+        container.innerHTML = '<div class="platform-pill"><strong>No data yet</strong><span>Add courses first</span></div>';
+        return;
+    }
+    entries.forEach(([platform, count]) => {
+        const div = document.createElement("div");
+        div.className = "platform-pill";
+        div.innerHTML = `<strong>${escapeHTML(platform)}</strong><span>${count} course(s)</span>`;
+        container.appendChild(div);
+    });
+}
+
+function renderTable() {
+    updatePlatformFilter();
+    updateAnalytics();
+
+    const tbody = document.querySelector("#courseTable tbody");
+    const emptyState = document.getElementById("emptyState");
+    tbody.innerHTML = "";
+    const filtered = getFilteredCourses();
+
+    emptyState.style.display = filtered.length ? "none" : "block";
+
+    filtered.forEach((course) => {
+        const deadline = getDeadlineInfo(course);
+        const progress = calculateProgress(course);
+        const tr = document.createElement("tr");
         tr.innerHTML = `
+            <td><span class="badge purple">#${escapeHTML(course.roadmapOrder || "-")}</span></td>
             <td>${escapeHTML(course.serial)}</td>
-            <td>${escapeHTML(course.name)}</td>
-            <td><a href="${escapeHTML(safeUrl(course.weblink))}" target="_blank" rel="noopener">Link</a></td>
-            <td>${escapeHTML(course.certificate)}</td>
-            <td>${escapeHTML(course.hours)}</td>
-            <td>${escapeHTML(course.university)}</td>
-            <td>${escapeHTML(course.startDate)}</td>
-            <td>${escapeHTML(course.completeDate)}</td>
-            <td>${status}</td>
-            <td><div class="progress-bar-container"><div class="progress-bar" style="width:${progress}%"></div></div> ${progress}%</td>
-            <td>${escapeHTML(course.rating)}</td>
+            <td><strong>${escapeHTML(course.name)}</strong><br><small>${escapeHTML(course.tags)}</small></td>
+            <td><span class="badge">${escapeHTML(course.platform)}</span></td>
+            <td>${escapeHTML(course.provider)}</td>
             <td>${escapeHTML(course.category)}</td>
-            <td>${escapeHTML(course.instructor)}</td>
-            <td>${escapeHTML(course.price)}</td>
-            <td>${escapeHTML(course.tags)}</td>
-            <td>${escapeHTML(course.notes)}</td>
-            <td>${course.certLink ? `<a href="${escapeHTML(safeUrl(course.certLink))}" target="_blank" rel="noopener">Link</a>` : ''}</td>
+            <td>${escapeHTML(course.skillLevel)}</td>
+            <td><span class="badge ${getStatusClass(course.manualStatus)}">${escapeHTML(course.manualStatus)}</span></td>
+            <td><span class="badge ${course.priority === "High" ? "danger" : course.priority === "Medium" ? "warning" : "success"}">${escapeHTML(course.priority)}</span></td>
             <td>
-                <button class="action-btn edit-btn" onclick="editCourse('${course.id}')">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteCourse('${course.id}')">Delete</button>
+                Start: ${escapeHTML(course.startDate || "-")}<br>
+                Target: ${escapeHTML(course.targetCompleteDate || "-")}<br>
+                Actual: ${escapeHTML(course.actualCompleteDate || "-")}
+            </td>
+            <td><span class="badge ${deadline.type}">${escapeHTML(deadline.text)}</span></td>
+            <td>
+                <div class="progress-shell"><div class="progress-bar" style="width:${progress}%"></div></div>
+                ${progress}%
+            </td>
+            <td>
+                Total: ${escapeHTML(course.hours)}h<br>
+                Weekly: ${escapeHTML(course.weeklyTarget || 0)}h
+            </td>
+            <td>${escapeHTML(course.costType)}<br><small>${escapeHTML(course.price)}</small></td>
+            <td>
+                <span class="badge ${course.certificateStatus.includes("Earned") || course.certificateStatus.includes("Uploaded") ? "success" : ""}">${escapeHTML(course.certificateStatus)}</span><br>
+                Issue: ${escapeHTML(course.certIssueDate || "-")}<br>
+                ID: ${escapeHTML(course.credentialId || "-")}
+            </td>
+            <td>${escapeHTML(course.rating || 0)} / 5</td>
+            <td>
+                <strong>Goal:</strong> ${escapeHTML(course.learningGoal)}<br>
+                <strong>Key:</strong> ${escapeHTML(course.keyLearnings)}<br>
+                <strong>Outcome:</strong> ${escapeHTML(course.outcome)}
+            </td>
+            <td>
+                ${course.weblink ? `<a href="${escapeHTML(course.weblink)}" target="_blank" rel="noopener">Course</a><br>` : ""}
+                ${course.certLink ? `<a href="${escapeHTML(course.certLink)}" target="_blank" rel="noopener">Certificate</a><br>` : ""}
+                ${course.projectLink ? `<a href="${escapeHTML(course.projectLink)}" target="_blank" rel="noopener">Project</a>` : ""}
+            </td>
+            <td>
+                <div class="row-actions">
+                    <button class="small secondary" type="button" onclick="editCourseById('${course.id}')">Edit</button>
+                    <button class="small danger" type="button" onclick="deleteCourseById('${course.id}')">Delete</button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
     });
-
-    const totalCourses = courses.length;
-    const completedCourses = courses.filter(c => calculateStatus(c) === 'Completed').length;
-    const avgRating = totalCourses ? (courses.reduce((sum, c) => sum + Number(c.rating || 0), 0) / totalCourses).toFixed(2) : '0.00';
-    const totalHours = courses.reduce((sum, c) => sum + Number(c.hours || 0), 0);
-
-    document.getElementById('totalCourses').textContent = totalCourses;
-    document.getElementById('completedCourses').textContent = completedCourses;
-    document.getElementById('avgRating').textContent = avgRating;
-    document.getElementById('totalHours').textContent = totalHours;
 }
 
-window.editCourse = function(courseId) {
-    const c = courses.find(course => course.id === courseId);
-    if (!c) return;
-
-    editDocId = courseId;
-
-    for (const key in c) {
-        if (document.getElementById(key)) {
-            document.getElementById(key).value = c[key] || '';
-        }
-    }
-
-    document.getElementById('submitBtn').textContent = 'Update Course';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-window.deleteCourse = async function(courseId) {
-    if (!confirm('Delete this course?')) return;
+async function saveCourse(event) {
+    event.preventDefault();
+    const course = getFormData();
 
     try {
-        await deleteDoc(doc(db, "courses", courseId));
-        await loadCourses();
-    } catch (error) {
-        console.error(error);
-        alert('Delete failed. Check Firestore rules.');
-    }
-};
-
-document.getElementById('courseForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const course = {
-        serial: document.getElementById('serial').value.trim(),
-        name: document.getElementById('name').value.trim(),
-        weblink: document.getElementById('weblink').value.trim(),
-        certificate: document.getElementById('certificate').value,
-        hours: document.getElementById('hours').value,
-        university: document.getElementById('university').value.trim(),
-        startDate: document.getElementById('startDate').value,
-        completeDate: document.getElementById('completeDate').value,
-        rating: document.getElementById('rating').value,
-        category: document.getElementById('category').value.trim(),
-        instructor: document.getElementById('instructor').value.trim(),
-        price: document.getElementById('price').value.trim(),
-        tags: document.getElementById('tags').value.trim(),
-        notes: document.getElementById('notes').value.trim(),
-        certLink: document.getElementById('certLink').value.trim(),
-        updatedAt: new Date().toISOString()
-    };
-
-    try {
+        setStatus(editDocId ? "Updating course..." : "Saving course...");
         if (editDocId) {
-            await updateDoc(doc(db, "courses", editDocId), course);
-            editDocId = null;
-            document.getElementById('submitBtn').textContent = 'Add / Save Course';
+            await updateDoc(doc(db, "courses", editDocId), {
+                ...course,
+                updatedAt: serverTimestamp()
+            });
         } else {
-            course.createdAt = new Date().toISOString();
-            await addDoc(coursesCollection, course);
+            await addDoc(coursesCollection, {
+                ...course,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            });
         }
-
-        e.target.reset();
+        resetForm();
         await loadCourses();
+        setStatus("Course saved successfully.");
     } catch (error) {
         console.error(error);
-        alert('Save failed. Check Firestore rules.');
+        setStatus("Could not save course. Check Firestore rules.");
     }
-});
+}
 
-document.getElementById('search').addEventListener('input', renderTable);
-document.getElementById('filterStatus').addEventListener('change', renderTable);
-document.getElementById('filterCertificate').addEventListener('change', renderTable);
-document.getElementById('sortBy').addEventListener('change', renderTable);
+window.editCourseById = function(id) {
+    const course = courses.find((c) => c.id === id);
+    if (!course) return;
+    editDocId = id;
+    fillForm(course);
+    document.getElementById("submitBtn").textContent = "Update Course";
+    document.getElementById("formHeading").textContent = "Edit Course";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setStatus("Editing selected course.");
+};
 
-document.getElementById('darkModeToggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-});
+window.deleteCourseById = async function(id) {
+    const course = courses.find((c) => c.id === id);
+    const name = course?.name || "this course";
+    if (!confirm(`Delete ${name}?`)) return;
 
-document.getElementById('exportCSV').addEventListener('click', () => {
-    let csv = 'Serial,Name,Weblink,Certificate,Hours,University,StartDate,CompleteDate,Rating,Category,Instructor,Price,Tags,Notes,CertLink\n';
-    courses.forEach(c => {
-        csv += `"${c.serial || ''}","${c.name || ''}","${c.weblink || ''}","${c.certificate || ''}","${c.hours || ''}","${c.university || ''}","${c.startDate || ''}","${c.completeDate || ''}","${c.rating || ''}","${c.category || ''}","${c.instructor || ''}","${c.price || ''}","${c.tags || ''}","${c.notes || ''}","${c.certLink || ''}"\n`;
-    });
+    try {
+        setStatus("Deleting course...");
+        await deleteDoc(doc(db, "courses", id));
+        await loadCourses();
+        setStatus("Course deleted successfully.");
+    } catch (error) {
+        console.error(error);
+        setStatus("Could not delete course. Check Firestore rules.");
+    }
+};
 
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const link = document.createElement('a');
+function csvEscape(value) {
+    return `"${String(value ?? "").replaceAll('"', '""')}"`;
+}
+
+function exportCSV() {
+    const header = fields.join(",");
+    const rows = courses.map((course) => fields.map((field) => csvEscape(course[field])).join(","));
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = 'courses.csv';
+    link.download = "learning-dashboard-courses.csv";
     link.click();
-});
+}
 
-document.getElementById('importCSV').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
+function parseCSVLine(line) {
+    const result = [];
+    let current = "";
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const next = line[i + 1];
+        if (char === '"' && inQuotes && next === '"') {
+            current += '"';
+            i++;
+        } else if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === "," && !inQuotes) {
+            result.push(current);
+            current = "";
+        } else {
+            current += char;
+        }
+    }
+    result.push(current);
+    return result;
+}
+
+async function importCSV(event) {
+    const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = async function(event) {
+    reader.onload = async function(e) {
+        const lines = e.target.result.split(/\r?\n/).filter(Boolean);
+        if (lines.length < 2) return;
+        const header = parseCSVLine(lines[0]);
+        let count = 0;
+
         try {
-            const lines = event.target.result.split('\n').slice(1);
-
-            for (const line of lines) {
-                const vals = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, ''));
-                if (vals[0]) {
-                    await addDoc(coursesCollection, {
-                        serial: vals[0] || '',
-                        name: vals[1] || '',
-                        weblink: vals[2] || '',
-                        certificate: vals[3] || '',
-                        hours: vals[4] || '',
-                        university: vals[5] || '',
-                        startDate: vals[6] || '',
-                        completeDate: vals[7] || '',
-                        rating: vals[8] || '',
-                        category: vals[9] || '',
-                        instructor: vals[10] || '',
-                        price: vals[11] || '',
-                        tags: vals[12] || '',
-                        notes: vals[13] || '',
-                        certLink: vals[14] || '',
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString()
-                    });
-                }
+            setStatus("Importing CSV to Firebase...");
+            for (const line of lines.slice(1)) {
+                const values = parseCSVLine(line);
+                const course = {};
+                header.forEach((field, index) => course[field] = values[index] || "");
+                await addDoc(coursesCollection, {
+                    ...normalizeCourse(course),
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+                count++;
             }
-
             await loadCourses();
-            e.target.value = '';
+            setStatus(`Imported ${count} course(s) successfully.`);
+            event.target.value = "";
         } catch (error) {
             console.error(error);
-            alert('CSV import failed.');
+            setStatus("CSV import failed. Check Firestore rules.");
         }
     };
-
     reader.readAsText(file);
+}
+
+["search", "filterPlatform", "filterStatus", "filterPriority", "filterCertificate", "sortBy"].forEach((id) => {
+    document.getElementById(id).addEventListener("input", renderTable);
+    document.getElementById(id).addEventListener("change", renderTable);
 });
+
+document.getElementById("courseForm").addEventListener("submit", saveCourse);
+document.getElementById("clearFormBtn").addEventListener("click", resetForm);
+document.getElementById("refreshBtn").addEventListener("click", loadCourses);
+document.getElementById("exportCSV").addEventListener("click", exportCSV);
+document.getElementById("importCSV").addEventListener("change", importCSV);
+document.getElementById("darkModeToggle").addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("learningDashboardDark", document.body.classList.contains("dark-mode") ? "yes" : "no");
+});
+
+if (localStorage.getItem("learningDashboardDark") === "yes") {
+    document.body.classList.add("dark-mode");
+}
 
 loadCourses();
 </script>
-
 </body>
 </html>
